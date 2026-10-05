@@ -66,6 +66,7 @@ public class PlayerMovement : MonoBehaviour
         Vector3 startPosition = transform.position;
         Vector3 startVelocity = jumpDirection * jumpPower;
 
+        Vector3 previousPoint = transform.position;
         lineRenderer.positionCount = linePoints;
 
         for (int i = 0; i < linePoints; i++)
@@ -77,7 +78,17 @@ public class PlayerMovement : MonoBehaviour
                 + startVelocity * time
                 + 0.5f * Physics.gravity * time * time;
 
+            Vector3 disBetweenPoints = point - previousPoint;
+
+            if (Physics.Raycast(previousPoint, disBetweenPoints.normalized, out RaycastHit hit, disBetweenPoints.magnitude))
+            {
+                lineRenderer.positionCount = i + 1;
+                lineRenderer.SetPosition(i, hit.point);
+                break;
+            }
+
             lineRenderer.SetPosition(i, point);
+            previousPoint = point;
         }
     }
 }
