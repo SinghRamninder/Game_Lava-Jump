@@ -2,20 +2,31 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float maxJumpPower = 50f;
+    [Header("Jump")]
+    [SerializeField] private float maxJumpPower = 25f;
     [SerializeField] private float minJumpPower = 5f;
     [SerializeField] private float chargingSpeed = 2f;
+
+    [Header("Gravity")]
+    [SerializeField] private float gravityMultiplier = 3f;
+
+    [Header("Trajectory")]
     [SerializeField] private LineRenderer lineRenderer;
     [SerializeField] private int linePoints = 30;
     [SerializeField] private float timeBetweenPoints = 0.1f;
+    [SerializeField] private GameObject landingAreaObject;
+    [SerializeField] private Transform lineRendStartPos;
+
     private float jumpPower;
     private Vector3 jumpDirection = new Vector3(0f, 1f, 1f).normalized;
     private Rigidbody rb;
     private bool isChargingJump = false;
+    private bool isAirborne = false;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        landingAreaObject.SetActive(false);
     }
 
     private void Start()
@@ -23,10 +34,10 @@ public class PlayerMovement : MonoBehaviour
         lineRenderer.enabled = false;
         jumpPower = minJumpPower;
     }
-
+        
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (!isAirborne && Input.GetKeyDown(KeyCode.Space))
         {
             isChargingJump = true;
             lineRenderer.enabled = true;
@@ -42,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
         if (isChargingJump && Input.GetKeyUp(KeyCode.Space))
         {
             Jump();
+            landingAreaObject.SetActive(false);
         }
 
         if (isChargingJump && Input.GetKeyDown(KeyCode.E))
@@ -49,6 +61,18 @@ public class PlayerMovement : MonoBehaviour
             isChargingJump = false;
             lineRenderer.enabled = false;
             jumpPower = minJumpPower;
+            landingAreaObject.SetActive(false);
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (isAirborne)
+        {
+            rb.AddForce(
+                Physics.gravity * (gravityMultiplier - 1f),
+                ForceMode.Acceleration
+            );
         }
     }
 
@@ -58,15 +82,18 @@ public class PlayerMovement : MonoBehaviour
         rb.linearVelocity = jumpDirection * jumpPower;
         jumpPower = minJumpPower;
         isChargingJump = false;
+        isAirborne = true;
         lineRenderer.enabled = false;
     }
 
     private void DrawTrajectory()
     {
-        Vector3 startPosition = transform.position;
+        Vector3 startPosition = lineRendStartPos.position;
         Vector3 startVelocity = jumpDirection * jumpPower;
 
-        Vector3 previousPoint = transform.position;
+        Vector3 gravity = Physics.gravity * gravityMultiplier;
+
+        Vector3 previousPoint = lineRendStartPos.position;
         lineRenderer.positionCount = linePoints;
 
         for (int i = 0; i < linePoints; i++)
@@ -76,7 +103,7 @@ public class PlayerMovement : MonoBehaviour
             Vector3 point =
                 startPosition
                 + startVelocity * time
-                + 0.5f * Physics.gravity * time * time;
+                + 0.5f * gravity * time * time;
 
             Vector3 disBetweenPoints = point - previousPoint;
 
@@ -84,11 +111,25 @@ public class PlayerMovement : MonoBehaviour
             {
                 lineRenderer.positionCount = i + 1;
                 lineRenderer.SetPosition(i, hit.point);
+                landingAreaObject.transform.position = new Vector3(hit.point.x, hit.point.y + 0.05f, hit.point.z);
+                landingAreaObject.transform.rotation = Quaternion.LookRotation(-hit.normal);
+                landingAreaObject.SetActive(true);
                 break;
             }
 
+            landingAreaObject.SetActive(false);
+
             lineRenderer.SetPosition(i, point);
             previousPoint = point;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Platform"))
+        {
+            rb.linearVelocity = Vector3.zero;
+            isAirborne = false;
         }
     }
 }

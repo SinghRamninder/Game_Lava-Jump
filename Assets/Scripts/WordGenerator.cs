@@ -7,13 +7,23 @@ public class WordGenerator : MonoBehaviour
     [SerializeField] private PlatformPool normalPlatform;
     [SerializeField] private PlatformPool movingPlatform;
     [SerializeField] private PlatformPool breakingPlatform;
+    [SerializeField] private PlatformPool lavaPlane;
     [SerializeField] private float farthestGeneratedDistance = 30f;
     [SerializeField] private float minPlatformGap = 4f;
     [SerializeField] private float maxPlatformGap = 8f;
+    [SerializeField] private float lavaPlaneSpawnDestroyDistance = 18f;
+    [SerializeField] private GameObject lastLavaPlane;
 
     private Dictionary<GameObject, int> activePlatforms = new Dictionary<GameObject, int>();
 
+    private List<GameObject> activeLavaPlanes = new List<GameObject>();
+
     private float lastGeneratedPlatformZ = 0f;
+
+    private void Start()
+    {
+        activeLavaPlanes.Add(lastLavaPlane);
+    }
 
     private void Update()
     {
@@ -22,7 +32,20 @@ public class WordGenerator : MonoBehaviour
             CreatePlatform();
         }
 
+        Renderer lastLavaRenderer = lastLavaPlane.GetComponent<Renderer>();
+
+        float lastLavaPlaneLength = lastLavaRenderer.bounds.size.z;
+
+        float lastLavaPlaneEnd =
+            lastLavaPlane.transform.position.z + lastLavaPlaneLength / 2f;
+
+        if (player.transform.position.z + lavaPlaneSpawnDestroyDistance > lastLavaPlaneEnd)
+        {
+            CreateLavaChunk();
+        }
+
         RemovePlatform();
+        RemoveLavaChunk();
     }
 
 
@@ -55,7 +78,21 @@ public class WordGenerator : MonoBehaviour
 
     private void CreateLavaChunk()
     {
+        Renderer renderer = lastLavaPlane.GetComponent<Renderer>();
 
+        float planeLength = renderer.bounds.size.z;
+
+        Vector3 spawnPosition =
+            lastLavaPlane.transform.position +
+            lastLavaPlane.transform.forward * planeLength;
+
+        GameObject spawnPlane = lavaPlane.GetPlatform();
+
+        spawnPlane.transform.position = spawnPosition;
+
+        activeLavaPlanes.Add(spawnPlane);
+
+        lastLavaPlane = spawnPlane;
     }
 
     private void RemovePlatform()
@@ -94,6 +131,28 @@ public class WordGenerator : MonoBehaviour
 
     private void RemoveLavaChunk()
     {
+        List<GameObject> lavaPlanesToRemove = new List<GameObject>();
 
+        foreach (GameObject currentLavaPlane in activeLavaPlanes)
+        {
+            Renderer renderer = currentLavaPlane.GetComponent<Renderer>();
+
+            float planeLength = renderer.bounds.size.z;
+
+            float planeEnd =
+                currentLavaPlane.transform.position.z + planeLength / 2f;
+
+            if (planeEnd < player.transform.position.z - lavaPlaneSpawnDestroyDistance)
+            {
+                lavaPlanesToRemove.Add(currentLavaPlane);
+            }
+        }
+
+        foreach (GameObject currentLavaPlane in lavaPlanesToRemove)
+        {
+            lavaPlane.ReturnPlatform(currentLavaPlane);
+
+            activeLavaPlanes.Remove(currentLavaPlane);
+        }
     }
 }
