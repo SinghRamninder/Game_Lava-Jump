@@ -8,10 +8,12 @@ public class WordGenerator : MonoBehaviour
     [SerializeField] private PlatformPool movingPlatform;
     [SerializeField] private PlatformPool breakingPlatform;
     [SerializeField] private PlatformPool lavaPlane;
-    [SerializeField] private float farthestGeneratedDistance = 30f;
+    [SerializeField] private float platformSpawnDistance = 30f;
+    [SerializeField] private float platformDestroyDistance = 40f;
     [SerializeField] private float minPlatformGap = 4f;
     [SerializeField] private float maxPlatformGap = 8f;
-    [SerializeField] private float lavaPlaneSpawnDestroyDistance = 18f;
+    [SerializeField] private float lavaPlaneSpawnDistance = 18f;
+    [SerializeField] private float lavaPlaneDestroyDistance = 30f;
     [SerializeField] private GameObject lastLavaPlane;
 
     private Dictionary<GameObject, int> activePlatforms = new Dictionary<GameObject, int>();
@@ -27,7 +29,7 @@ public class WordGenerator : MonoBehaviour
 
     private void Update()
     {
-        if (player.transform.position.z + farthestGeneratedDistance > lastGeneratedPlatformZ)
+        if (player.transform.position.z + platformSpawnDistance > lastGeneratedPlatformZ)
         {
             CreatePlatform();
         }
@@ -39,7 +41,7 @@ public class WordGenerator : MonoBehaviour
         float lastLavaPlaneEnd =
             lastLavaPlane.transform.position.z + lastLavaPlaneLength / 2f;
 
-        if (player.transform.position.z + lavaPlaneSpawnDestroyDistance > lastLavaPlaneEnd)
+        if (player.transform.position.z + lavaPlaneSpawnDistance > lastLavaPlaneEnd)
         {
             CreateLavaChunk();
         }
@@ -72,7 +74,7 @@ public class WordGenerator : MonoBehaviour
         }
         activePlatforms.Add(platform, platformType);
 
-        platform.transform.position = new Vector3(3.94f, 0.58f, lastGeneratedPlatformZ + platformGap);
+        platform.transform.position = new Vector3(player.transform.position.x, 0.58f, lastGeneratedPlatformZ + platformGap);
         lastGeneratedPlatformZ = platform.transform.position.z;
     }
 
@@ -101,7 +103,7 @@ public class WordGenerator : MonoBehaviour
 
         foreach (var currentPlatform in activePlatforms)
         {
-            if (currentPlatform.Key.transform.position.z - player.transform.position.z < -30f)
+            if (currentPlatform.Key.transform.position.z - player.transform.position.z < -platformDestroyDistance)
             {
                 switch (currentPlatform.Value)
                 {
@@ -142,7 +144,7 @@ public class WordGenerator : MonoBehaviour
             float planeEnd =
                 currentLavaPlane.transform.position.z + planeLength / 2f;
 
-            if (planeEnd < player.transform.position.z - lavaPlaneSpawnDestroyDistance)
+            if (planeEnd < player.transform.position.z - lavaPlaneDestroyDistance)
             {
                 lavaPlanesToRemove.Add(currentLavaPlane);
             }
