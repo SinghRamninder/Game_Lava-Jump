@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: LavaWave
+  m_Shader: {fileID: 4800000, guid: 43d51259a4057394eadbf1308e104399, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _BaseGlowHeight: 1.5
+    - _BaseHeat: 0.35
+    - _BubbleAmount: 0.4
+    - _BumpHeight: 0.06
+    - _CellScale: 1.5
+    - _CrackWidth: 0.13
+    - _CrustAmount: 0.66
+    - _CrustSmoothness: 0.1
+    - _DisplaceAmount: 0.45
+    - _DisplaceScale: 0.22
+    - _EmissionIntensity: 1
+    - _FloorHeight: 0
+    - _FlowSpeed: 1.2
+    - _FlowStretch: 0.6
+    - _FrontHeat: 0.1
+    - _LipHeat: 0.18
+    - _LobeAmount: 1.2
+    - _MoltenSmoothness: 0.4
+    - _PatternScale: 0.45
+    - _PulseSpeed: 1.3
+    - _RimIntensity: 0.3
+    - _RimPower: 5
+    - _SurfaceFlow: 2.5
+    - _WarpStrength: 1.2
+    m_Colors:
+    - _ColorCore: {r: 2.4, g: 1.5, b: 0.45, a: 1}
+    - _ColorDeep: {r: 0.45, g: 0.02, b: 0, a: 1}
+    - _ColorHot: {r: 2, g: 0.55, b: 0.04, a: 1}
+    - _ColorMid: {r: 1.4, g: 0.16, b: 0, a: 1}
+    - _CrustColor: {r: 0.045, g: 0.032, b: 0.028, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
