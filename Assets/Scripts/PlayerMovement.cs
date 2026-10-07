@@ -23,6 +23,12 @@ public class PlayerMovement : MonoBehaviour
     private bool isChargingJump = false;
     private bool isAirborne = false;
 
+    public bool IsChargingJump => isChargingJump;
+    public bool IsAirborne => isAirborne;
+    public float ChargeAmount => Mathf.InverseLerp(minJumpPower, maxJumpPower, jumpPower);
+    public event System.Action Jumped;
+    public event System.Action Landed;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -84,6 +90,7 @@ public class PlayerMovement : MonoBehaviour
         isChargingJump = false;
         isAirborne = true;
         lineRenderer.enabled = false;
+        Jumped?.Invoke();
     }
 
     private void DrawTrajectory()
@@ -129,7 +136,12 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.CompareTag("Platform"))
         {
             rb.linearVelocity = Vector3.zero;
+            bool wasAirborne = isAirborne;
             isAirborne = false;
+            if (wasAirborne)
+            {
+                Landed?.Invoke();
+            }
         }
     }
 }
