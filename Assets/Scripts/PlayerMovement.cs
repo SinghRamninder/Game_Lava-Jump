@@ -1,7 +1,12 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Input")]
+    [SerializeField] private InputAction chargeJumpAction = CreateButton("ChargeJump", "<Keyboard>/space", "<Mouse>/leftButton");
+    [SerializeField] private InputAction cancelJumpAction = CreateButton("CancelJump", "<Keyboard>/e", "<Mouse>/rightButton");
+
     [Header("Jump")]
     [SerializeField] private float maxJumpPower = 25f;
     [SerializeField] private float minJumpPower = 5f;
@@ -22,8 +27,10 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody rb;
     private bool isChargingJump = false;
     private bool isAirborne = false;
+    private bool waitForChargeRelease = false;
 
     public bool IsChargingJump => isChargingJump;
+    public bool UsingMouse { get; private set; }
     public bool IsAirborne => isAirborne;
     public float ChargeAmount => Mathf.InverseLerp(minJumpPower, maxJumpPower, jumpPower);
     public event System.Action Jumped;
@@ -40,34 +47,81 @@ public class PlayerMovement : MonoBehaviour
         lineRenderer.enabled = false;
         jumpPower = minJumpPower;
     }
-        
+
+    private void OnEnable()
+    {
+        chargeJumpAction.Enable();
+        cancelJumpAction.Enable();
+    }
+
+    private void OnDisable()
+    {
+        chargeJumpAction.Disable();
+        cancelJumpAction.Disable();
+    }
+
+    private static InputAction CreateButton(string name, params string[] bindings)
+    {
+        var action = new InputAction(name, InputActionType.Button);
+        foreach (string binding in bindings)
+        {
+            action.AddBinding(binding);
+        }
+        return action;
+    }
+
     private void Update()
     {
-        if (!isAirborne && Input.GetKeyDown(KeyCode.Space))
+        TrackInputDevice();
+
+        bool chargeHeld = chargeJumpAction.IsPressed();
+        if (!chargeHeld)
+        {
+            waitForChargeRelease = false;
+        }
+
+        bool wantsToCharge = chargeJumpAction.WasPressedThisFrame() || (chargeHeld && !waitForChargeRelease);
+        if (!isAirborne && !isChargingJump && wantsToCharge)
         {
             isChargingJump = true;
             lineRenderer.enabled = true;
         }
 
-        if (isChargingJump && Input.GetKey(KeyCode.Space))
+        if (isChargingJump && chargeHeld)
         {
             jumpPower += chargingSpeed * Time.deltaTime;
             jumpPower = Mathf.Clamp(jumpPower, minJumpPower, maxJumpPower);
             DrawTrajectory();
         }
 
-        if (isChargingJump && Input.GetKeyUp(KeyCode.Space))
+        if (isChargingJump && chargeJumpAction.WasReleasedThisFrame())
         {
             Jump();
             landingAreaObject.SetActive(false);
         }
 
-        if (isChargingJump && Input.GetKeyDown(KeyCode.E))
+        if (isChargingJump && cancelJumpAction.WasPressedThisFrame())
         {
+            waitForChargeRelease = true;
             isChargingJump = false;
             lineRenderer.enabled = false;
             jumpPower = minJumpPower;
             landingAreaObject.SetActive(false);
+        }
+    }
+
+    private void TrackInputDevice()
+    {
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard != null && keyboard.anyKey.wasPressedThisFrame)
+        {
+            UsingMouse = false;
+        }
+
+        Mouse mouse = Mouse.current;
+        if (mouse != null && (mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame || mouse.middleButton.wasPressedThisFrame))
+        {
+            UsingMouse = true;
         }
     }
 
@@ -135,13 +189,35 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Platform"))
         {
-            rb.linearVelocity = Vector3.zero;
-            bool wasAirborne = isAirborne;
-            isAirborne = false;
-            if (wasAirborne)
+            Land();
+        }
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (!isAirborne || rb.linearVelocity.y > 0.01f || !collision.gameObject.CompareTag("Platform"))
+        {
+            return;
+        }
+
+        for (int i = 0; i < collision.contactCount; i++)
+        {
+            if (Mathf.Abs(collision.GetContact(i).normal.y) > 0.7f)
             {
-                Landed?.Invoke();
+                Land();
+                return;
             }
+        }
+    }
+
+    private void Land()
+    {
+        rb.linearVelocity = Vector3.zero;
+        bool wasAirborne = isAirborne;
+        isAirborne = false;
+        if (wasAirborne)
+        {
+            Landed?.Invoke();
         }
     }
 

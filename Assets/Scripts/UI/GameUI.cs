@@ -2,6 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 // HUD (distance + session best), pause menu and death screen.
@@ -20,6 +21,14 @@ public class GameUI : MonoBehaviour
     [Header("HUD")]
     [SerializeField] private TMP_Text distanceText;
     [SerializeField] private TMP_Text bestText;
+
+    [Header("Cancel Jump Hint")]
+    [SerializeField] private PlayerMovement playerMovement;
+    [SerializeField] private CanvasGroup cancelHint;
+    [SerializeField] private TMP_Text cancelKeyText;
+    [SerializeField] private string keyboardCancelKey = "E";
+    [SerializeField] private string mouseCancelKey = "RIGHT CLICK";
+    [SerializeField] private float hintFadeSpeed = 8f;
 
     [Header("Pause Menu")]
     [SerializeField] private CanvasGroup pauseMenu;
@@ -45,6 +54,7 @@ public class GameUI : MonoBehaviour
     private bool isDead;
     private RectTransform distanceRect;
     private float popTimer;
+    private bool? hintShowsMouse;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
@@ -74,6 +84,7 @@ public class GameUI : MonoBehaviour
         distanceRect = distanceText.rectTransform;
         HideInstant(pauseMenu);
         HideInstant(deathScreen);
+        cancelHint.alpha = 0f;
         Time.timeScale = 1f;
     }
 
@@ -94,7 +105,8 @@ public class GameUI : MonoBehaviour
 
     private void Update()
     {
-        if (!isDead && Input.GetKeyDown(KeyCode.Escape))
+        Keyboard keyboard = Keyboard.current;
+        if (!isDead && keyboard != null && keyboard.escapeKey.wasPressedThisFrame)
         {
             if (isPaused) Resume();
             else Pause();
@@ -104,6 +116,8 @@ public class GameUI : MonoBehaviour
         {
             UpdateHud(force: false);
         }
+
+        UpdateCancelHint();
 
         // Little pop on the distance counter whenever it goes up
         if (popTimer > 0f)
@@ -132,6 +146,20 @@ public class GameUI : MonoBehaviour
         SessionBest = Mathf.Max(SessionBest, runBest);
         distanceText.text = Meters(distance);
         bestText.text = Meters(SessionBest);
+    }
+
+    // Shown while charging; says E or RIGHT CLICK depending on the device the player used last
+    private void UpdateCancelHint()
+    {
+        bool show = playerMovement.IsChargingJump && !isPaused && !isDead;
+        cancelHint.alpha = Mathf.MoveTowards(cancelHint.alpha, show ? 1f : 0f, hintFadeSpeed * Time.unscaledDeltaTime);
+
+        bool mouse = playerMovement.UsingMouse;
+        if (hintShowsMouse != mouse)
+        {
+            hintShowsMouse = mouse;
+            cancelKeyText.text = mouse ? mouseCancelKey : keyboardCancelKey;
+        }
     }
 
     // ---------- Pause ----------
