@@ -144,4 +144,17 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Lava"))
+        {
+            rb.linearVelocity = Vector3.zero;
+            isAirborne = false;
+            isChargingJump = false;
+            lineRenderer.enabled = false;
+            landingAreaObject.SetActive(false);
+            GameUI.PlayerDied();
+        }
+    }
 }
