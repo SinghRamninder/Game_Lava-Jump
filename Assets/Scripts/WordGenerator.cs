@@ -12,6 +12,7 @@ public class WordGenerator : MonoBehaviour
     [SerializeField] private float platformDestroyDistance = 40f;
     [SerializeField] private float minPlatformGap = 4f;
     [SerializeField] private float maxPlatformGap = 8f;
+    [SerializeField] private float platformHeightVariation = 1f;
     [SerializeField] private float lavaPlaneSpawnDistance = 18f;
     [SerializeField] private float lavaPlaneDestroyDistance = 30f;
     [SerializeField] private GameObject lastLavaPlane;
@@ -19,6 +20,9 @@ public class WordGenerator : MonoBehaviour
     private Dictionary<GameObject, int> activePlatforms = new Dictionary<GameObject, int>();
 
     private List<GameObject> activeLavaPlanes = new List<GameObject>();
+
+    private Dictionary<GameObject, float> originalPlatformYScales = new Dictionary<GameObject, float>();
+    private Dictionary<GameObject, float> originalMovingPlatformMaxHeights = new Dictionary<GameObject, float>();
 
     private float lastGeneratedPlatformZ = 0f;
 
@@ -72,10 +76,50 @@ public class WordGenerator : MonoBehaviour
                 platform = normalPlatform.GetPlatform();
                 break;
         }
+
         activePlatforms.Add(platform, platformType);
 
-        platform.transform.position = new Vector3(player.transform.position.x, 0.58f, lastGeneratedPlatformZ + platformGap);
+        float heightVariation = Random.Range(-platformHeightVariation, platformHeightVariation);
+
+        if (platformType == 1 || platformType == 3)
+        {
+            if (!originalPlatformYScales.ContainsKey(platform))
+            {
+                originalPlatformYScales.Add(platform, platform.transform.localScale.y);
+            }
+
+            // Variation is in world units: the platform's top moves up/down by heightVariation
+            Vector3 scale = platform.transform.localScale;
+            scale.y = originalPlatformYScales[platform] + heightVariation / GetLocalTop(platform);
+            platform.transform.localScale = scale;
+        }
+        else if (platformType == 2)
+        {
+            MovingPlatform movingPlatformScript = platform.GetComponent<MovingPlatform>();
+
+            if (!originalMovingPlatformMaxHeights.ContainsKey(platform))
+            {
+                originalMovingPlatformMaxHeights.Add(platform, movingPlatformScript.maxHeight);
+            }
+
+            movingPlatformScript.maxHeight = originalMovingPlatformMaxHeights[platform] + heightVariation;
+        }
+
+        platform.transform.position = new Vector3(player.transform.position.x, platform.transform.position.y, lastGeneratedPlatformZ + platformGap);
         lastGeneratedPlatformZ = platform.transform.position.z;
+    }
+
+    // Height of the platform mesh's top above its pivot, before scaling
+    private float GetLocalTop(GameObject platform)
+    {
+        MeshCollider meshCollider = platform.GetComponent<MeshCollider>();
+        if (meshCollider != null && meshCollider.sharedMesh != null)
+        {
+            return Mathf.Max(meshCollider.sharedMesh.bounds.max.y, 0.01f);
+        }
+
+        MeshFilter meshFilter = platform.GetComponentInChildren<MeshFilter>();
+        return meshFilter != null ? Mathf.Max(meshFilter.sharedMesh.bounds.max.y, 0.01f) : 1f;
     }
 
     private void CreateLavaChunk()
