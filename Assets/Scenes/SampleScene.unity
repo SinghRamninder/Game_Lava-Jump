@@ -345,7 +345,7 @@ GameObject:
   - component: {fileID: 119244319}
   m_Layer: 0
   m_Name: Lava
-  m_TagString: Untagged
+  m_TagString: Lava
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -437,7 +437,7 @@ Transform:
   m_GameObject: {fileID: 119244318}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.6, z: -28.6}
+  m_LocalPosition: {x: 0, y: 1.6, z: -40}
   m_LocalScale: {x: 1.41, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -523,10 +523,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChasingLava
   player: {fileID: 999565297}
   lava: {fileID: 119244318}
-  chaseDistance: 50
-  spawnDistance: 40
-  noProgressTimeLimit: 1
-  chaseSpeed: 2
+  chaseDistance: 56
+  spawnDistance: 52
+  noProgressTimeLimit: 1.5
+  chaseSpeed: 3
 --- !u!4 &166925802
 Transform:
   m_ObjectHideFlags: 0
@@ -1713,7 +1713,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -2143,7 +2143,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4278719018
   m_fontColor: {r: 0.16470589, g: 0.07058824, b: 0.03137255, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -2156,7 +2156,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -3381,7 +3381,7 @@ MonoBehaviour:
   bestText: {fileID: 1217350243}
   pauseMenu: {fileID: 1436702527}
   pausePanel: {fileID: 1856424126}
-  mainMenuScene: 
+  mainMenuScene: MainMenu
   deathScreen: {fileID: 620761559}
   deathPanel: {fileID: 408408197}
   deathDistanceText: {fileID: 810416658}
@@ -3527,7 +3527,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   maxJumpPower: 20
   minJumpPower: 5
-  chargingSpeed: 12
+  chargingSpeed: 14
   gravityMultiplier: 3
   lineRenderer: {fileID: 999565304}
   linePoints: 30
@@ -4102,7 +4102,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4279921663
   m_fontColor: {r: 1, g: 0.41960785, b: 0.101960786, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -4115,7 +4115,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -14800,7 +14800,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 1946157055
   m_fontColor: {r: 1, g: 1, b: 1, a: 0.45}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -14813,7 +14813,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
