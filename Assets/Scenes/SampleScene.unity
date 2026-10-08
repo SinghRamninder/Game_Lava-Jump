@@ -1841,7 +1841,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 12
   m_Type: 1
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.8930817, g: 0.73665625, b: 0.5083263, a: 1}
   m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
@@ -1851,7 +1851,7 @@ Light:
     m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 1
+    m_Strength: 0.185
     m_Bias: 0.05
     m_NormalBias: 0.4
     m_NearPlane: 0.2
@@ -1885,7 +1885,7 @@ Light:
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
-  m_ColorTemperature: 5000
+  m_ColorTemperature: 4331
   m_UseColorTemperature: 1
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
@@ -1925,7 +1925,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UsePipelineSettings: 1
   m_AdditionalLightsShadowResolutionTier: 2
-  m_CustomShadowLayers: 0
+  m_CustomShadowLayers: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 1
@@ -3527,7 +3527,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   maxJumpPower: 20
   minJumpPower: 5
-  chargingSpeed: 14
+  chargingSpeed: 17
   gravityMultiplier: 3
   lineRenderer: {fileID: 999565304}
   linePoints: 30
@@ -15491,12 +15491,13 @@ MonoBehaviour:
   lavaPlane: {fileID: 906938397}
   platformSpawnDistance: 32
   platformDestroyDistance: 40
-  minPlatformGap: 7.5
-  maxPlatformGap: 11
+  minPlatformGap: 6
+  maxPlatformGap: 9
   platformHeightVariation: 0.4
   lavaPlaneSpawnDistance: 30
   lavaPlaneDestroyDistance: 43
   lastLavaPlane: {fileID: 1463170923}
+  chasingLava: {fileID: 166925801}
 --- !u!4 &1935812497
 Transform:
   m_ObjectHideFlags: 0

@@ -20612,7 +20612,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7195944040894128811}
-  - component: {fileID: 7046185874562986894}
+  - component: {fileID: 5803915420184804593}
   - component: {fileID: 1257872424576732341}
   m_Layer: 0
   m_Name: BreakingPlatform
@@ -20639,8 +20639,8 @@ Transform:
   - {fileID: 5964123594525615056}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!64 &7046185874562986894
-MeshCollider:
+--- !u!65 &5803915420184804593
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -20657,10 +20657,9 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -6903835854943235716, guid: 98cfff723e8f4b74d8417e4e27fd0e37, type: 3}
+  serializedVersion: 3
+  m_Size: {x: 1.8364215, y: 0.28594756, z: 1.8748043}
+  m_Center: {x: -0.0072171423, y: 0.8552828, z: -0.009751782}
 --- !u!114 &1257872424576732341
 MonoBehaviour:
   m_ObjectHideFlags: 0

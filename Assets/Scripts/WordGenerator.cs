@@ -16,6 +16,7 @@ public class WordGenerator : MonoBehaviour
     [SerializeField] private float lavaPlaneSpawnDistance = 18f;
     [SerializeField] private float lavaPlaneDestroyDistance = 30f;
     [SerializeField] private GameObject lastLavaPlane;
+    [SerializeField] private ChasingLava chasingLava;
 
     private Dictionary<GameObject, int> activePlatforms = new Dictionary<GameObject, int>();
 
@@ -23,12 +24,23 @@ public class WordGenerator : MonoBehaviour
 
     private Dictionary<GameObject, float> originalPlatformYScales = new Dictionary<GameObject, float>();
     private Dictionary<GameObject, float> originalMovingPlatformMaxHeights = new Dictionary<GameObject, float>();
+    private Dictionary<GameObject, float> originalBreakingPlatformBreakDelays = new Dictionary<GameObject, float>();
 
     private float lastGeneratedPlatformZ = 0f;
+    private float difficulty = 0f;
+    private float originalChasingLavaSpeed;
+    private float originalChasingLavaNoProgressTimeLimit;
+    private float originalPlayerChargingSpeed;
+    private PlayerMovement playerMovement;
 
     private void Start()
     {
         activeLavaPlanes.Add(lastLavaPlane);
+
+        originalChasingLavaSpeed = chasingLava.chaseSpeed;
+        originalChasingLavaNoProgressTimeLimit = chasingLava.noProgressTimeLimit;
+        playerMovement = player.GetComponent<PlayerMovement>();
+        originalPlayerChargingSpeed = playerMovement.chargingSpeed;
     }
 
     private void Update()
@@ -57,7 +69,31 @@ public class WordGenerator : MonoBehaviour
 
     private void CreatePlatform()
     {
-        int platformType = Random.Range(1, 4);
+        float currentDifficulty = Mathf.Clamp01(difficulty);
+
+        float normalChance = Mathf.Lerp(80f, 35f, currentDifficulty);
+        float movingChance = Mathf.Lerp(15f, 30f, currentDifficulty);
+        float breakingChance = Mathf.Lerp(5f, 35f, currentDifficulty);
+
+        float randomValue = Random.Range(0f, 100f);
+
+        int platformType;
+
+        if (randomValue < normalChance)
+        {
+            platformType = 1;
+        }
+        else if (randomValue < normalChance + movingChance)
+        {
+            platformType = 2;
+        }
+        else
+        {
+            platformType = 3;
+        }
+
+        maxPlatformGap = Mathf.Lerp(7f, 11.5f, currentDifficulty);
+
         float platformGap = Random.Range(minPlatformGap, maxPlatformGap);
 
         GameObject platform;
@@ -79,7 +115,8 @@ public class WordGenerator : MonoBehaviour
 
         activePlatforms.Add(platform, platformType);
 
-        float heightVariation = Random.Range(-platformHeightVariation, platformHeightVariation);
+        float maxHeightVariation = Mathf.Lerp(platformHeightVariation, platformHeightVariation * 2f, currentDifficulty);
+        float heightVariation = Random.Range(-platformHeightVariation, maxHeightVariation);
 
         if (platformType == 1 || platformType == 3)
         {
@@ -88,7 +125,6 @@ public class WordGenerator : MonoBehaviour
                 originalPlatformYScales.Add(platform, platform.transform.localScale.y);
             }
 
-            // Variation is in world units: the platform's top moves up/down by heightVariation
             Vector3 scale = platform.transform.localScale;
             scale.y = originalPlatformYScales[platform] + heightVariation / GetLocalTop(platform);
             platform.transform.localScale = scale;
@@ -106,10 +142,30 @@ public class WordGenerator : MonoBehaviour
         }
 
         platform.transform.position = new Vector3(player.transform.position.x, platform.transform.position.y, lastGeneratedPlatformZ + platformGap);
+
         lastGeneratedPlatformZ = platform.transform.position.z;
+
+        BreakingPlatform breakingPlatformScript = platform.GetComponent<BreakingPlatform>();
+        if (breakingPlatformScript != null)
+        {
+            if (!originalBreakingPlatformBreakDelays.ContainsKey(platform))
+            {
+                originalBreakingPlatformBreakDelays.Add(platform, breakingPlatformScript.breakDelay);
+            }
+
+            float originalBreakDelay = originalBreakingPlatformBreakDelays[platform];
+
+            breakingPlatformScript.breakDelay = Mathf.Lerp(originalBreakDelay, originalBreakDelay - 1f, currentDifficulty);
+        }
+
+        chasingLava.chaseSpeed = Mathf.Lerp(originalChasingLavaSpeed, originalChasingLavaSpeed * 2f, currentDifficulty);
+        chasingLava.noProgressTimeLimit = Mathf.Lerp(originalChasingLavaNoProgressTimeLimit, originalChasingLavaNoProgressTimeLimit - 0.7f, currentDifficulty);
+
+        playerMovement.chargingSpeed = Mathf.Lerp(originalPlayerChargingSpeed, originalPlayerChargingSpeed + 4f, currentDifficulty);
+
+        difficulty = Mathf.Clamp01(difficulty + 0.02f);
     }
 
-    // Height of the platform mesh's top above its pivot, before scaling
     private float GetLocalTop(GameObject platform)
     {
         MeshCollider meshCollider = platform.GetComponent<MeshCollider>();

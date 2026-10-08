@@ -6,7 +6,7 @@ public class ChasingLava : MonoBehaviour
     [SerializeField] private GameObject lava;
     [SerializeField] private float chaseDistance = 30f;
     [SerializeField] private float spawnDistance = 30f;
-    [SerializeField] private float noProgressTimeLimit = 1f;
+    public float noProgressTimeLimit = 1f;
     public float chaseSpeed = 5f;
 
     private float furtherstZPosition;

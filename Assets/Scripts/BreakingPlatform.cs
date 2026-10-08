@@ -5,7 +5,7 @@ using UnityEngine;
 // Resets itself in OnEnable so it works with PlatformPool.
 public class BreakingPlatform : MonoBehaviour
 {
-    [SerializeField] private float breakDelay = 3f;
+    public float breakDelay = 3f;
 
     [Header("Visuals (built by Tools > Platforms > Build Breaking Platform)")]
     [SerializeField] private Transform visual;

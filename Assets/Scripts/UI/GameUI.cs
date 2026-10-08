@@ -116,7 +116,7 @@ public class GameUI : MonoBehaviour
 
     private void UpdateHud(bool force)
     {
-        int current = Mathf.Max(0, Mathf.FloorToInt(player.position.z));
+        int current = Mathf.Max(0, Mathf.FloorToInt(player.position.z/5));
         if (current == distance && !force)
         {
             return;

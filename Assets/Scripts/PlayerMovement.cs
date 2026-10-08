@@ -5,7 +5,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Jump")]
     [SerializeField] private float maxJumpPower = 25f;
     [SerializeField] private float minJumpPower = 5f;
-    [SerializeField] private float chargingSpeed = 2f;
+    public float chargingSpeed = 2f;
 
     [Header("Gravity")]
     [SerializeField] private float gravityMultiplier = 3f;
