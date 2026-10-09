@@ -30,7 +30,10 @@ public class MainMenu : MonoBehaviour
     public void Back()
     {
         creditsMenuObject.SetActive(false);
-        optionsMenuObject.SetActive(false);
+        if (optionsMenuObject != null)
+        {
+            optionsMenuObject.SetActive(false);
+        }
         mainMenuObject.SetActive(true);
     }
 

@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-// Smooth grow on hover / shrink on press. Uses unscaled time so it works while the game is paused.
-public class UIButtonFeel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
+// Smooth grow on hover / shrink on press, plus the click sound. Uses unscaled time so it works while paused.
+public class UIButtonFeel : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
 {
     [SerializeField] private float hoverScale = 1.06f;
     [SerializeField] private float pressScale = 0.95f;
@@ -44,5 +44,13 @@ public class UIButtonFeel : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public void OnPointerUp(PointerEventData eventData)
     {
         target = hovered ? hoverScale : 1f;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            AudioManager.PlayClick();
+        }
     }
 }

@@ -211,6 +211,7 @@ public class GameUI : MonoBehaviour
         newHighScore.SetActive(beatBest);
 
         SetGameplayRunning(false);
+        AudioManager.OnPlayerDied();   // death sound + music fades out
         StartCoroutine(ShowPanel(deathScreen, deathPanel));
         StartCoroutine(CountUp(deathDistanceText, runBest));
     }
@@ -218,6 +219,10 @@ public class GameUI : MonoBehaviour
     public void PlayAgain()
     {
         Time.timeScale = 1f;
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayMusicFromStart();
+        }
         Scene scene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(scene.buildIndex >= 0 ? scene.buildIndex : 0);
     }

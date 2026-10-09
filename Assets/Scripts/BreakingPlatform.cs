@@ -15,6 +15,16 @@ public class BreakingPlatform : MonoBehaviour
     [SerializeField] private ParticleSystem crumbleParticles;
     [SerializeField] private ParticleSystem breakParticles;
 
+    [Header("Sound (3D, quieter the further away)")]
+    [Tooltip("Looping heavy rock vibration while the platform cracks and shakes")]
+    [SerializeField] private AudioSource vibrateSound;
+    [SerializeField] private float vibrateVolume = 0.7f;
+    [SerializeField] private Vector2 vibratePitch = new Vector2(0.85f, 1.05f);
+    [Tooltip("Played when the platform shatters into falling pieces")]
+    [SerializeField] private AudioSource breakSound;
+    [Tooltip("Skip the start of the shatter clip (seconds)")]
+    [SerializeField] private float breakSoundStartTime = 0.1f;
+
     [Header("Cracking")]
     [SerializeField] private float crumbleTime = 0.5f;
     [SerializeField] private float maxShake = 0.04f;
@@ -104,6 +114,14 @@ public class BreakingPlatform : MonoBehaviour
         SetCrumbleRate(0f);
         crumbleParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         breakParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (breakSound != null)
+        {
+            breakSound.Stop();
+        }
+        if (vibrateSound != null)
+        {
+            vibrateSound.Stop();
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -118,6 +136,13 @@ public class BreakingPlatform : MonoBehaviour
         // Mesh space == this transform's local space, so the cracks start right under the player
         impactPoint = transform.InverseTransformPoint(collision.GetContact(0).point);
         crumbleParticles.Play(true);
+
+        if (vibrateSound != null)
+        {
+            vibrateSound.volume = 0f;
+            vibrateSound.time = Random.Range(0f, vibrateSound.clip.length * 0.9f);   // vary the loop start
+            vibrateSound.Play();
+        }
     }
 
     private void Update()
@@ -138,6 +163,14 @@ public class BreakingPlatform : MonoBehaviour
 
             float shake = state == State.Crumbling ? 1.25f : Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.2f, 1f, progress));
             Shake(shake);
+
+            // Rock vibration swells (and strains a little higher) as the cracks spread
+            if (vibrateSound != null)
+            {
+                float intensity = state == State.Crumbling ? 1f : Mathf.Lerp(0.3f, 1f, progress);
+                vibrateSound.volume = vibrateVolume * intensity;
+                vibrateSound.pitch = Mathf.Lerp(vibratePitch.x, vibratePitch.y, intensity);
+            }
 
             if (state == State.Cracking && timer >= crackDuration)
             {
@@ -196,6 +229,18 @@ public class BreakingPlatform : MonoBehaviour
         SetCrumbleRate(0f);
         crumbleParticles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         breakParticles.Play(true);
+
+        // The rock gives way: vibration stops, shatter plays
+        if (vibrateSound != null)
+        {
+            vibrateSound.Stop();
+        }
+        if (breakSound != null && breakSound.clip != null)
+        {
+            breakSound.pitch = Random.Range(0.95f, 1.05f);
+            breakSound.time = Mathf.Min(breakSoundStartTime, breakSound.clip.length - 0.01f);
+            breakSound.Play();
+        }
 
         for (int i = 0; i < chunks.Length; i++)
         {
