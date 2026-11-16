@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Platform
   - Lava
+  - DesktopLayout
+  - MobileLayout
   layers:
   - Default
   - TransparentFX

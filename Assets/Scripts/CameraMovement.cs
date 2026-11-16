@@ -4,7 +4,7 @@ public class CameraMovement : MonoBehaviour
 {
     [SerializeField] private GameObject player;
     [SerializeField] private float smoothTime = 0.3f;
-    [SerializeField] private float zOffset = 7.9f;
+    public float zOffset = 7.9f;
 
     private Vector3 velocity = Vector3.zero;
 
